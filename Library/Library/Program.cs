@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -37,8 +38,26 @@ namespace Library
 
             using (var context = new AppContext())
             {
-                //context.Students.SqlQuery("Select * from Students s, StudentBooks sb where s.id = sb.student_id and sb.book_id is not null", new SqlParameter());
-                //context.Students.
+                //1
+                foreach(var student in context.Database.SqlQuery<Student>
+                    ("Select distinct s.id, s.fullname from Students s, StudentBooks sb where s.id = sb.student_id and sb.book_id is not null"))
+                {
+                    Console.WriteLine(student.FullName);
+                }
+
+                //2                
+                foreach (var author in context.Database.SqlQuery<Author>
+                    ($"Select a.id, a.fullname from Books b, BookAuthors ba, Authors a where b.id=ba.book_id and ba.author_id=a.id and b.id = '{context.Books.ToList()[2].Id}'"))
+                {
+                    Console.WriteLine(author.FullName);
+                }
+
+                //3
+                foreach(var book in context.Database.SqlQuery<Book>
+                    ("Select b.id, b.name from Books b, StudentBooks sb where b.id=sb.book_id and not exists"))
+                {
+                    Console.WriteLine(book.Name);
+                }
             }
             Console.Read();
         }
